@@ -48,3 +48,7 @@ func (s *Server) setupRoutes() {
 func (s *Server) Listen(port string) error {
 	return s.app.Listen(port)
 }
+
+func (s *Server) Shutdown() error {
+	return s.app.Shutdown()
+}

@@ -2,10 +2,11 @@
 package jobs
 
 import (
-	"github.com/robfig/cron/v3"
-	"gorm.io/gorm"
 	"log"
 	"msmc/src/config"
+
+	"github.com/robfig/cron/v3"
+	"gorm.io/gorm"
 )
 
 type JobManager struct {
@@ -34,4 +35,9 @@ func (jm *JobManager) StartJobs() {
 
 	jm.cron.Start()
 	log.Println("All cron jobs started")
+}
+
+func (jm *JobManager) Stop() {
+	<-jm.cron.Stop().Done()
+	log.Println("All cron jobs stopped")
 }

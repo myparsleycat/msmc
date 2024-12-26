@@ -16,7 +16,7 @@ type ChromeBrowser struct {
 	messageHandler func(string)
 }
 
-func NewChromeBrowser(messageHandler func(string)) *ChromeBrowser {
+func NewChromeBrowser(parentCtx context.Context, messageHandler func(string)) *ChromeBrowser {
 	log.Printf("Chrome 옵션 설정")
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("headless", true),
@@ -24,7 +24,7 @@ func NewChromeBrowser(messageHandler func(string)) *ChromeBrowser {
 	)
 
 	log.Printf("Chrome context 생성")
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	allocCtx, cancel := chromedp.NewExecAllocator(parentCtx, opts...)
 	ctx, ctxCancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
 
 	combinedCancel := func() {

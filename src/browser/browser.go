@@ -2,6 +2,7 @@
 package browser
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"msmc/src/arcalive"
@@ -9,12 +10,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func Start(db *gorm.DB) {
+func Start(ctx context.Context, db *gorm.DB) {
 	messageHandler := func(payload string) {
 		handleMessage(db, payload)
 	}
 
-	chrome := NewChromeBrowser(messageHandler)
+	chrome := NewChromeBrowser(ctx, messageHandler)
 	defer chrome.Close()
 
 	chrome.SetupWebSocketListener()
@@ -26,11 +27,17 @@ func Start(db *gorm.DB) {
 		errCh <- chrome.Start("https://arca.live/b/genshinskinmode", cookies)
 	}()
 
-	if err := <-errCh; err != nil {
-		log.Printf("브라우저 오류 발생: %v", err)
+	select {
+	case err := <-errCh:
+		if err != nil {
+			log.Printf("브라우저 오류 발생: %v", err)
+			return
+		}
+		log.Printf("브라우저 시작 완료")
+	case <-ctx.Done():
+		log.Printf("브라우저 종료 요청됨")
 		return
 	}
-	log.Printf("브라우저 시작 완료")
 }
 
 func handleMessage(db *gorm.DB, payload string) {
