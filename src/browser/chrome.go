@@ -60,6 +60,10 @@ func (c *ChromeBrowser) Start(url string, cookies []*network.CookieParam) error 
 	)
 
 	if err != nil {
+		// context.Canceled 에러는 정상 종료로 처리
+		if err == context.Canceled {
+			return nil
+		}
 		log.Printf("브라우저 시작 실패: %v", err)
 		return err
 	}
