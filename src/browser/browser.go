@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"log"
 	"msmc/src/arcalive"
-	"msmc/src/database"
+
+	"gorm.io/gorm"
 )
 
-func Start() {
-	chrome := NewChromeBrowser(handleMessage)
+func Start(db *gorm.DB) {
+	messageHandler := func(payload string) {
+		handleMessage(db, payload)
+	}
+
+	chrome := NewChromeBrowser(messageHandler)
 	defer chrome.Close()
 
 	chrome.SetupWebSocketListener()
@@ -28,10 +33,10 @@ func Start() {
 	log.Printf("브라우저 시작 완료")
 }
 
-func handleMessage(payload string) {
+func handleMessage(db *gorm.DB, payload string) {
 	fmt.Println("메시지 받음", payload)
 	if payload == "na" {
-		crawler := arcalive.NewCrawler(database.GetDB())
+		crawler := arcalive.NewCrawler(db)
 		created, updated, err := crawler.GetPost("https://arca.live/b/genshinskinmode")
 		if err != nil {
 			log.Fatalf("크롤링 실패: %v", err)

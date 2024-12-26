@@ -5,6 +5,8 @@ import (
 	"log"
 	"msmc/src/browser"
 	"msmc/src/config"
+	"msmc/src/database"
+	"msmc/src/jobs"
 	"msmc/src/server"
 
 	"github.com/joho/godotenv"
@@ -17,9 +19,16 @@ func main() {
 	}
 
 	cfg := config.LoadConfig()
+	db := database.GetDB()
 
-	go browser.Start()
+	// cron
+	jobManager := jobs.NewJobManager(cfg, db)
+	jobManager.StartJobs()
 
-	app := server.NewServer(cfg)
+	// chromedp
+	go browser.Start(db)
+
+	// fiber
+	app := server.NewServer(db, cfg)
 	log.Fatal(app.Listen(cfg.Port))
 }

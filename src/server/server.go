@@ -8,20 +8,23 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"gorm.io/gorm"
 )
 
 type Server struct {
 	app    *fiber.App
+	db     *gorm.DB
 	config *config.Config
 }
 
-func NewServer(cfg *config.Config) *Server {
+func NewServer(db *gorm.DB, cfg *config.Config) *Server {
 	app := fiber.New(fiber.Config{
 		AppName: "msmc",
 	})
 
 	server := &Server{
 		app:    app,
+		db:     db,
 		config: cfg,
 	}
 
@@ -39,7 +42,7 @@ func (s *Server) setupMiddlewares() {
 func (s *Server) setupRoutes() {
 	api := s.app.Group("/api")
 
-	routes.SetupArcaliveRoutes(api)
+	routes.SetupArcaliveRoutes(api, s.db)
 }
 
 func (s *Server) Listen(port string) error {

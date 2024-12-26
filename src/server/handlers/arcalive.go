@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"msmc/src/database"
+	"msmc/src/arcalive"
 	"net/url"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type GetUserStateHttpResponse struct {
@@ -18,9 +19,7 @@ type GetUserStateQueryResult struct {
 	ReviewCount int64
 }
 
-func GetUserState(c *fiber.Ctx) error {
-	db := database.GetDB()
-
+func GetUserState(c *fiber.Ctx, db *gorm.DB) error {
 	encodedUsername := c.Params("username")
 	username, err := url.QueryUnescape(encodedUsername)
 	if err != nil {
@@ -46,4 +45,23 @@ func GetUserState(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(response)
+}
+
+func GetAuditsHandler(c *fiber.Ctx) error {
+	baseURL := "https://arca.live/b/genshinskinmode/audit"
+
+	audits, err := arcalive.GetAudits(baseURL)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"data": fiber.Map{
+			"audits": audits,
+		},
+	})
 }

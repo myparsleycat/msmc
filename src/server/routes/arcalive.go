@@ -1,12 +1,17 @@
 package routes
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"msmc/src/server/handlers"
+
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
-func SetupArcaliveRoutes(router fiber.Router) {
+func SetupArcaliveRoutes(router fiber.Router, db *gorm.DB) {
 	arcalive := router.Group("/arcalive")
 
-	arcalive.Get("/:username", handlers.GetUserState)
+	// arcalive.Get("/audit", handlers.GetAuditsHandler)
+	arcalive.Get("/:username", func(c *fiber.Ctx) error {
+		return handlers.GetUserState(c, db)
+	})
 }
