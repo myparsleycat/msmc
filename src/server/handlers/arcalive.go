@@ -3,6 +3,7 @@ package handlers
 import (
 	"msmc/src/database"
 	"net/url"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -27,6 +28,8 @@ func GetUserState(c *fiber.Ctx) error {
 			"error": "Invalid username encoding",
 		})
 	}
+
+	username = strings.Replace(username, "~", "#", 1)
 
 	var result GetUserStateQueryResult
 	db.Raw(`
