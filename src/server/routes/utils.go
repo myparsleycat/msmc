@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"msmc/src/server/handlers"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -8,5 +10,7 @@ import (
 func UtilsRoute(router fiber.Router, db *gorm.DB) {
 	utils := router.Group("/utils")
 
-	utils.Get("/reload")
+	utils.Get("/reload", func(c *fiber.Ctx) error {
+		return handlers.UtilsReloadHandler(c, db)
+	})
 }
