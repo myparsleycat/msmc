@@ -28,7 +28,7 @@ func (jm *JobManager) StartJobs() {
 	cleanupJob := NewArcaliveCleanupJob(jm.db, "https://arca.live/b/genshinskinmode/audit")
 
 	// 2분마다 실행
-	_, err := jm.cron.AddFunc("*/2 * * * *", cleanupJob.Execute)
+	_, err := jm.cron.AddFunc("*/5 * * * *", cleanupJob.Execute)
 	if err != nil {
 		log.Printf("Failed to add cleanup job: %v", err)
 		return
