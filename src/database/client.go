@@ -18,7 +18,7 @@ var (
 
 // GetDB 싱글톤
 func GetDB() *gorm.DB {
-	db_path := os.Getenv("DB_PATH")
+	db_path := os.Getenv("DB_PATH") + "?cache=shared&_journal_mode=WAL"
 
 	once.Do(func() {
 		db, err := gorm.Open(sqlite.Open(db_path), &gorm.Config{})

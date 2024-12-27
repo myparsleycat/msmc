@@ -13,4 +13,8 @@ func UtilsRoute(router fiber.Router, db *gorm.DB) {
 	utils.Get("/reload", func(c *fiber.Ctx) error {
 		return handlers.UtilsReloadHandler(c, db)
 	})
+
+	utils.Get("/test", func(c *fiber.Ctx) error {
+		return handlers.UtilsTestHandler(c, db)
+	})
 }
