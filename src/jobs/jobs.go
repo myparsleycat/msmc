@@ -3,6 +3,7 @@ package jobs
 
 import (
 	"log"
+	"msmc/src/browser"
 	"msmc/src/config"
 
 	"github.com/robfig/cron/v3"
@@ -30,6 +31,13 @@ func (jm *JobManager) StartJobs() {
 	_, err := jm.cron.AddFunc("*/2 * * * *", cleanupJob.Execute)
 	if err != nil {
 		log.Printf("Failed to add cleanup job: %v", err)
+		return
+	}
+
+	// 1시간마다 실행
+	_, err = jm.cron.AddFunc("* */1 * * *", browser.TriggerPageReload)
+	if err != nil {
+		log.Printf("Failed to add page reload job: %v", err)
 		return
 	}
 
