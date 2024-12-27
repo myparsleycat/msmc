@@ -42,6 +42,7 @@ func (s *Server) setupMiddlewares() {
 func (s *Server) setupRoutes() {
 	api := s.app.Group("/api")
 
+	routes.UtilsRoute(api, s.db)
 	routes.SetupArcaliveRoutes(api, s.db)
 }
 
