@@ -72,19 +72,20 @@ func (c *ChromeBrowser) PageReload() error {
 	log.Printf("새로고침 시작")
 	err := chromedp.Run(c.ctx,
 		chromedp.Reload(),
-		chromedp.WaitVisible("body"),
+		chromedp.WaitReady("body", chromedp.ByQuery),
 	)
 
 	if err != nil {
-		if err == context.Canceled {
-			return nil
+		if err == context.Canceled || err == context.DeadlineExceeded {
+			log.Printf("페이지 새로고침 타임아웃 또는 취소됨: %v", err)
+			return err
 		}
 		log.Printf("페이지 새로고침 실패: %v", err)
 		return err
-	} else {
-		log.Printf("페이지 새로고침 완료")
-		return nil
 	}
+
+	log.Printf("페이지 새로고침 완료")
+	return nil
 }
 
 func (c *ChromeBrowser) Start(url string, cookies []*network.CookieParam) error {
