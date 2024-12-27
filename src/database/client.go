@@ -3,6 +3,7 @@ package database
 
 import (
 	"log"
+	"os"
 	"sync"
 
 	"gorm.io/driver/sqlite"
@@ -17,9 +18,10 @@ var (
 
 // GetDB 싱글톤
 func GetDB() *gorm.DB {
+	db_path := os.Getenv("DB_PATH")
+
 	once.Do(func() {
-		dsn := "msmc.db?cache=shared&_journal_mode=WAL"
-		db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+		db, err := gorm.Open(sqlite.Open(db_path), &gorm.Config{})
 		if err != nil {
 			log.Fatal("데이터베이스 연결 실패:", err)
 		}

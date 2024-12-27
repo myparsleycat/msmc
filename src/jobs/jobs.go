@@ -5,6 +5,7 @@ import (
 	"log"
 	"msmc/src/browser"
 	"msmc/src/config"
+	"os"
 
 	"github.com/robfig/cron/v3"
 	"gorm.io/gorm"
@@ -26,6 +27,7 @@ func NewJobManager(cfg *config.Config, db *gorm.DB) *JobManager {
 
 func (jm *JobManager) StartJobs() {
 	cleanupJob := NewArcaliveCleanupJob(jm.db, "https://arca.live/b/genshinskinmode/audit")
+	backupJob := NewBackupJob(os.Getenv("DB_PATH"))
 
 	// 2분마다 실행
 	_, err := jm.cron.AddFunc("*/5 * * * *", cleanupJob.Execute)
@@ -42,6 +44,13 @@ func (jm *JobManager) StartJobs() {
 	})
 	if err != nil {
 		log.Printf("Failed to add page reload job: %v", err)
+		return
+	}
+
+	// 30분마다 실행
+	_, err = jm.cron.AddFunc("*/30 * * * *", backupJob.Execute)
+	if err != nil {
+		log.Printf("Failed to add backup job: %v", err)
 		return
 	}
 
