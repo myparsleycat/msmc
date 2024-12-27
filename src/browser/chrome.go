@@ -50,10 +50,11 @@ func NewChromeBrowser(parentCtx context.Context, messageHandler func(string)) *C
 	return instance
 }
 
-func TriggerPageReload() {
+func TriggerPageReload() error {
 	if instance != nil {
-		instance.PageReload()
+		return instance.PageReload()
 	}
+	return nil
 }
 
 func (c *ChromeBrowser) SetupWebSocketListener() {
@@ -67,7 +68,7 @@ func (c *ChromeBrowser) SetupWebSocketListener() {
 	})
 }
 
-func (c *ChromeBrowser) PageReload() {
+func (c *ChromeBrowser) PageReload() error {
 	log.Printf("새로고침 시작")
 	err := chromedp.Run(c.ctx,
 		chromedp.Reload(),
@@ -76,11 +77,13 @@ func (c *ChromeBrowser) PageReload() {
 
 	if err != nil {
 		if err == context.Canceled {
-			return
+			return nil
 		}
 		log.Printf("페이지 새로고침 실패: %v", err)
+		return err
 	} else {
 		log.Printf("페이지 새로고침 완료")
+		return nil
 	}
 }
 

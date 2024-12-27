@@ -35,7 +35,11 @@ func (jm *JobManager) StartJobs() {
 	}
 
 	// 1시간마다 실행
-	_, err = jm.cron.AddFunc("* */1 * * *", browser.TriggerPageReload)
+	_, err = jm.cron.AddFunc("* */1 * * *", func() {
+		if err := browser.TriggerPageReload(); err != nil {
+			log.Printf("Page reload failed: %v", err)
+		}
+	})
 	if err != nil {
 		log.Printf("Failed to add page reload job: %v", err)
 		return
