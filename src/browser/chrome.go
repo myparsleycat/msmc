@@ -63,9 +63,6 @@ func (c *ChromeBrowser) SetupWebSocketListener() {
 			if payload := ev.Response.PayloadData; strings.Contains(payload, "na") {
 				c.messageHandler(payload)
 			}
-		case *network.EventWebSocketClosed:
-			log.Printf("웹소켓 연결이 종료됨")
-			go c.PageReload()
 		}
 	})
 }
@@ -82,7 +79,6 @@ func (c *ChromeBrowser) PageReload() {
 			return
 		}
 		log.Printf("페이지 새로고침 실패: %v", err)
-		go c.PageReload()
 	} else {
 		log.Printf("페이지 새로고침 완료")
 	}
@@ -100,6 +96,7 @@ func (c *ChromeBrowser) Start(url string, cookies []*network.CookieParam) error 
 	)
 
 	if err != nil {
+		// context.Canceled 에러는 정상 종료로 처리
 		if err == context.Canceled {
 			return nil
 		}
